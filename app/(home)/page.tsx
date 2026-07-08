@@ -5,7 +5,7 @@ import { FeaturesList } from '@/app/(home)/hero/features';
 
 export default function LandingPage() {
   return (
-    <div className="bg-slate-950">
+    <div className="bg-color-brand-bg-deep">
       <HeroSection />
       <FeaturesList />
       <ServicesList />

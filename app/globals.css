@@ -1,4 +1,22 @@
 @import "tailwindcss";
 
-/* That's it! Tailwind v4 automatically scans all your files for classes now. */
-/* You can add any custom CSS overrides below this line if you need them. */
+@theme {
+  /* Surface / Background Palette */
+  --color-brand-bg-deep: #141414;     /* slate-950: Root layouts */
+  --color-brand-bg-main: #181818;     /* slate-900: Sections / Hero panels */
+  --color-brand-bg-card: #2f2f2f;     /* slate-800: Bento boxes / Hover components */
+
+  /* Border / Separation Elements */
+  --color-brand-border: #222222;      /* slate-800: Dynamic rules & dividers */
+  --color-brand-border-muted: #333333;/* slate-700: High contrast borders */
+
+  /* Text & Typography Hierarchy */
+  --color-brand-text-primary: #ffffff;  /* slate-50: Crisp headers & titles */
+  --color-brand-text-secondary: #e5e5e5;/* slate-300: Primary descriptions & body */
+  --color-brand-text-muted: #808080;    /* slate-400: Categories & captions */
+
+  /* Brand Accent & Action Triggers */
+  --color-brand-accent: #e50914;       /* indigo-600: Primary action buttons */
+  --color-brand-accent-hover: #b80710; /* indigo-500: Active hover focus states */
+  --color-brand-accent-glow: #ff1e27;  /* indigo-400: Linear gradient highlights */
+}
