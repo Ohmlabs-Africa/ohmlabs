@@ -41,11 +41,18 @@ const galleryItems: GalleryItem[] = [
     gridClass: 'md:col-span-1 md:row-span-1 min-h-[200px]',
   },
   {
-    src: '/dashboard.jpg', // Add a 5th image asset to public folder to build out the collage depth
+    src: '/dashboard.jpg', 
     alt: 'Automation tools and system script tasks',
     category: 'Automation',
     title: 'AI Workflows & Process Optimization',
     gridClass: 'md:col-span-2 md:row-span-1 min-h-[200px]',
+  },
+   {
+    src: '/growth.jpg',
+    alt: 'Business metrics analysis chart layout',
+    category: 'Analytics',
+    title: 'Data-Driven Growth Strategies',
+    gridClass: 'md:col-span-1 md:row-span-1 min-h-[200px]',
   },
 ];
 

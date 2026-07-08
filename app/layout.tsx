@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css"; // Your Tailwind styles loaded globally
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PlatformX",
+  title: "OhmLabs",
   description: "Dynamic workflows built with Next.js & Tailwind",
 };
 
