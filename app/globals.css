@@ -19,4 +19,37 @@
   --color-brand-accent: #e50914;       /* indigo-600: Primary action buttons */
   --color-brand-accent-hover: #b80710; /* indigo-500: Active hover focus states */
   --color-brand-accent-glow: #ff1e27;  /* indigo-400: Linear gradient highlights */
+
+  /* Background Images */
+  --background-main: url("/videowebdesign.png");
+  --background-card: url("/vidwebdesign.png");
+  --background-deep: url("/data.jpg");
+  --background-erp: url("/erp.jpg");
+}
+html,
+body {
+  font-family: var(--font-sans);
+}
+
+.bg-main {
+  background:
+    linear-gradient(rgba(24,24,24,.92), rgba(24,24,24,.92)),
+    var(--background-main);
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-deep {
+  background:
+    linear-gradient(rgba(20,20,20,.95), rgba(20,20,20,.95)),
+    var(--background-deep);
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-card {
+  background:
+    linear-gradient(rgba(47,47,47,.96), rgba(47,47,47,.96)),
+    var(--background-card);
+  background-size: cover;
 }

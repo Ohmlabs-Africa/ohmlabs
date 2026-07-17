@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
+
+
+const montserrat = Montserrat({ subsets: ['latin'],variable: "--font-montserrat",display: "swap", });
 
 export const metadata: Metadata = {
   title: "OhmLabs",
-  description: "Dynamic workflows built with Next.js & Tailwind",
+  description: "Ohm Labs is a software development and consulting company that specializes in building scalable web applications, business systems, data pipelines, and AI solutions.",
 };
 
 export default function RootLayout({
@@ -13,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased selection:bg-indigo-500/30">
+      <body className={`antialiased selection:bg-indigo-500/30 ${montserrat.variable}`}>
         {children}
       </body>
     </html>

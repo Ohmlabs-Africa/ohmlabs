@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Kalam } from 'next/font/google';
+
+const kalam = Kalam({ subsets: ['latin'], weight: '700' });
 
 interface BackgroundSlide {
   url: string;
@@ -10,20 +13,26 @@ interface BackgroundSlide {
 }
 
 const slides: BackgroundSlide[] = [
+
   {
-    url: '/erp.jpg',
-    headline: 'Tranquility in Entropy',
-    subpitch: 'Harmonizing disconnected operational frameworks into unified, scalable ERP environments.',
+    url: "/videowebdesign.png", 
+    headline: 'Build for Scale',
+    subpitch: 'From rapid prototyping to enterprise-grade web applications, we deploy scalable solutions using modern tech stacks.',
   },
   {
-    url: '/cloud.png',
-    headline: 'Data-Driven Execution',
-    subpitch: 'Engineering pristine, high-availability cloud pipeline architectures for modern enterprise data.',
+    url: "/vidwebdesign.png", 
+    headline: 'Business Systems',
+    subpitch: 'Bridging the gap between standard, out-of-the-box software and complex, industry-specific business processes with leading ERP suites.',
   },
   {
-    url: '/clouddesign.png',
-    headline: 'Automated AI Architectures',
-    subpitch: 'Deploying custom workflows and context-isolated technical solutions that outpace industry trends.',
+    url: "/data.jpg",
+    headline: 'Data Excellence',
+    subpitch: 'Architecting secure, compliant cloud and on-site data pipelines utilizing GCP and Azure for real-time decisions.',
+  },
+  {
+    url: "/erp.jpg", 
+    headline: 'AI Innovation',
+    subpitch: 'Building custom AI agents to automate repetitive processes, keeping your business ahead of the innovation curve.',
   }
 ];
 
@@ -33,8 +42,7 @@ export function HeroSection() {
   useEffect(() => {
     const slideInterval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
+    }, 6000); 
     return () => clearInterval(slideInterval);
   }, []);
 
@@ -45,39 +53,46 @@ export function HeroSection() {
         <div
           key={index}
           className={`absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide ? 'opacity-25 scale-100' : 'opacity-0 scale-105'
+            index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
           }`}
           style={{ backgroundImage: `url('${slide.url}')` }}
         />
       ))}
 
       {/* Cinematic Vignette Overlay Mask */}
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-bg-deep/50 via-brand-bg-deep/80 to-brand-bg-deep" />
-
+          <div
+              className="absolute inset-0"
+              style={{
+                  background:
+                      "linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.75) 45%, rgba(20,20,20,.96) 100%)",
+              }}
+          />
       {/* Pitch Content Display */}
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
-        <span className="inline-flex items-center rounded bg-brand-accent/20 px-3 py-1 text-xs font-bold text-brand-accent-glow backdrop-blur-md mb-6 uppercase tracking-widest">
-          Agile Certainty Enabled
-        </span>
-        
+       <span className={`${kalam.className} inline-flex items-center gap-3 uppercase text-3xl md:text-5xl font-black tracking-[0.2em]`}>
+        <span className="text-white">OHM</span>
+        <span className="text-brand-accent">LABS</span>
+        <span className="text-white">AFRICA</span>
+      </span>
+              
         {/* Dynamic Typography Transition */}
-        <h1 className="text-4xl font-black tracking-tighter text-brand-text-primary sm:text-6xl min-h-[120px] transition-all duration-500">
+        <h1 className="text-3xl font-black tracking-tighter text-white sm:text-6xl min-h-[120px] transition-all duration-700 ease-out transform translate-y-0">
           {slides[currentSlide].headline}
         </h1>
         
-        <p className="mt-6 text-base sm:text-lg leading-relaxed text-brand-text-secondary max-w-2xl mx-auto min-h-[60px] transition-all duration-500">
+        <p className="mt-3 text-base sm:text-lg leading-relaxed text-gray-300 max-w-3xl mx-auto min-h-[80px] transition-all duration-700 ease-out">
           {slides[currentSlide].subpitch}
         </p>
 
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <Link
-            href="/register"
-            className="rounded bg-brand-accent px-6 py-3 text-sm font-bold text-brand-text-primary shadow-2xl transition-all hover:bg-brand-accent-hover active:scale-98"
+            href="/contact"
+            className="rounded bg-brand-accent px-8 py-3.5 text-sm font-bold text-white shadow-2xl transition-all hover:bg-brand-accent-hover hover:scale-105 active:scale-95"
           >
-            Initialize Infrastructure
+            Scale With Certainty
           </Link>
-          <Link href="/about" className="text-sm font-bold leading-6 text-brand-text-secondary hover:text-brand-text-primary transition-colors">
-            Our Methods <span aria-hidden="true">→</span>
+          <Link href="/solutions" className="text-sm font-bold leading-6 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
+            Explore Solutions <span aria-hidden="true" className="text-brand-accent">→</span>
           </Link>
         </div>
       </div>
