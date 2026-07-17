@@ -21,10 +21,10 @@
   --color-brand-accent-glow: #ff1e27;  /* indigo-400: Linear gradient highlights */
 
   /* Background Images */
-  --background-main: url("/videowebdesign.png");
-  --background-card: url("/vidwebdesign.png");
-  --background-deep: url("/data.jpg");
-  --background-erp: url("/erp.jpg");
+  --background-main: url("/Comp-hero1.jpg");
+  --background-card: url("/Comp-hero2.jpg");
+  --background-deep: url("/Comp-hero3.jpg");
+  --background-erp: url("/Comp-hero4.jpg");
 }
 html,
 body {
