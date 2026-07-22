@@ -92,7 +92,7 @@ export function Header() {
               href="/contact"
               className="rounded-full bg-brand-accent px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-accent-hover hover:scale-105"
             >
-              Let's Talk
+              Let&apos;s Talk
             </Link>
           </div>
 
@@ -166,7 +166,7 @@ export function Header() {
               className="mt-4 rounded-full bg-brand-accent py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-accent-hover"
               onClick={() => setMobileOpen(false)}
             >
-              Let's Talk
+              Let&apos;s Talk
             </Link>
           </nav>
         </div>

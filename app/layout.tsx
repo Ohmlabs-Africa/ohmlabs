@@ -3,7 +3,8 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 
 
-const montserrat = Montserrat({ subsets: ['latin'],variable: "--font-montserrat",display: "swap", });
+const montserrat = Montserrat({ subsets: ['latin'],variable: "--font-montserrat",
+  display: "swap", });
 
 export const metadata: Metadata = {
   title: "OhmLabs",

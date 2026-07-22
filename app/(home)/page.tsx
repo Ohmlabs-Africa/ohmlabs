@@ -1,14 +1,13 @@
 import { HeroSection } from '@/app/(home)/hero/hero';
 import { ServicesList } from '@/components/layout/services';
 import { GalleryGrid } from '@/components/layout/gallery';
-// import FeaturesList from '@/app/(home)/features/features';
-// import {CapacityNetwork } from '@/components/features/features';
+import FeaturesPlanet from '@/app/(home)/features/features';
 
 export default function LandingPage() {
   return (
     <div className="bg-color-brand-bg-deep">
-      <HeroSection />
-      {/* <CapacityNetwork /> */}
+      <HeroSection />      
+      <FeaturesPlanet />
       <ServicesList />
       <GalleryGrid />
     </div>
