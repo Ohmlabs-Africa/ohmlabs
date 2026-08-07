@@ -9,6 +9,14 @@ const montserrat = Montserrat({ subsets: ['latin'],variable: "--font-montserrat"
 export const metadata: Metadata = {
   title: "OhmLabs",
   description: "Ohm Labs is a software development and consulting company that specializes in building scalable web applications, business systems, data pipelines, and AI solutions.",
+  icons: {
+    icon: [
+      { url: "/Ohm-logo.png", type: "image/png" }, 
+    ],
+    apple: [
+      { url: "/Ohm-logo.png", type: "image/png", sizes: "180x180" },
+    ],
+  },
 };
 
 export default function RootLayout({

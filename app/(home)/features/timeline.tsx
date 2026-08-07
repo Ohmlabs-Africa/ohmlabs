@@ -61,13 +61,13 @@ export default function ProcessTimeline() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: .8 }}
-                className="mx-auto mb-24 max-w-3xl text-center"
+                className="mx-auto mb-20 max-w-3xl px-6 sm:px-8 lg:px-0 text-center"
             >
                 <p className="mb-4 uppercase tracking-[0.35em] text-[var(--color-brand-accent)]">
                     OUR PROCESS
                 </p>
 
-                <h2 className="text-4xl font-bold text-white">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">
                     From Vision
                     <span className="text-[var(--color-brand-accent)]">
                         {" "}
@@ -75,7 +75,7 @@ export default function ProcessTimeline() {
                     </span>
                 </h2>
 
-                <p className="mt-6 text-base text-[var(--color-brand-text-secondary)]">
+                <p className="mt-5 text-sm sm:text-base lg:text-lg leading-7 text-[var(--color-brand-text-secondary)]">
                     Every engagement follows a structured,
                     collaborative implementation process that
                     ensures transparency, efficiency and
