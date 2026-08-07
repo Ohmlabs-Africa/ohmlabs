@@ -11,10 +11,10 @@ export const metadata: Metadata = {
   description: "Ohm Labs is a software development and consulting company that specializes in building scalable web applications, business systems, data pipelines, and AI solutions.",
   icons: {
     icon: [
-      { url: "/Ohm-logo.png", type: "image/png" }, 
+      { url: "/Ohmlabs.svg", type: "image/svg+xml" }, 
     ],
     apple: [
-      { url: "/Ohm-logo.png", type: "image/png", sizes: "180x180" },
+      { url: "/Ohmlabs.svg", type: "image/svg+xml" },
     ],
   },
 };
