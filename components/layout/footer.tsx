@@ -6,7 +6,6 @@ import {
     ArrowUpRight,
     Mail,
     MapPin,
-    Phone,
 } from "lucide-react";
 
 // Inline Brand Icons (Replaces missing lucide-react brand exports)
@@ -44,20 +43,20 @@ const LinkedinIcon = ({ size = 18 }: { size?: number }) => (
 );
 
 const company = [
-    "About",
-    "Our Process",
-    "Solutions",
-    "Industries",
-    "Careers",
+    { label: "About", href: "/about" },
+    { label: "Services", href: "/services" },
+    { label: "Projects", href: "/projects" },
+    { label: "Contact", href: "/contact" },
+    { label: "Solutions", href: "/solutions" },
 ];
 
 const services = [
-    "Artificial Intelligence",
-    "Cloud Solutions",
-    "ERP Implementation",
-    "Software Development",
-    "Data Analytics",
-    "Managed Support",
+    { label: "Artificial Intelligence", href: "/services" },
+    { label: "Cloud Solutions", href: "/services" },
+    { label: "ERP Implementation", href: "/services" },
+    { label: "Software Development", href: "/services" },
+    { label: "Data Analytics", href: "/services" },
+    { label: "Managed Support", href: "/contact" },
 ];
 
 
@@ -110,12 +109,12 @@ export default function Footer() {
 
                         <ul className="space-y-2">
                             {company.map((item) => (
-                                <li key={item}>
+                                <li key={item.label}>
                                     <Link
-                                        href="#"
-                                        className="group text-sm flex items-center gap-2 text-[var(--color-brand-text-secondary)] transition hover:text-[var(--color-brand-accent)]"
+                                        href={item.href}
+                                        className="group flex items-center gap-2 text-sm text-[var(--color-brand-text-secondary)] transition hover:text-[var(--color-brand-accent)]"
                                     >
-                                        {item}
+                                        {item.label}
                                         <ArrowUpRight
                                             size={15}
                                             className="translate-x-0 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
@@ -134,11 +133,13 @@ export default function Footer() {
 
                         <ul className="space-y-2">
                             {services.map((service) => (
-                                <li
-                                    key={service}
-                                    className="text-sm text-[var(--color-brand-text-secondary)] transition hover:text-[var(--color-brand-accent)]"
-                                >
-                                    {service}
+                                <li key={service.label}>
+                                    <Link
+                                        href={service.href}
+                                        className="text-sm text-[var(--color-brand-text-secondary)] transition hover:text-[var(--color-brand-accent)]"
+                                    >
+                                        {service.label}
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -184,7 +185,7 @@ export default function Footer() {
                         {/* Social Links */}
                         <div className="mt-8 flex gap-4">
                             {[
-                                { Icon: GithubIcon, href: "#" },
+                                { Icon: GithubIcon, href: "https://github.com" },
                                 { Icon: LinkedinIcon, href: "https://www.linkedin.com/company/135717760/" },
                             ].map((item, index) => (
                                 <motion.a
@@ -212,13 +213,13 @@ export default function Footer() {
                     </p>
 
                     <div className="flex flex-wrap gap-8">
-                        <Link href="#" className="transition hover:text-white">
+                        <Link href="/privacy" className="transition hover:text-white">
                             Privacy Policy
                         </Link>
-                        <Link href="#" className="transition hover:text-white">
+                        <Link href="/terms" className="transition hover:text-white">
                             Terms of Service
                         </Link>
-                        <Link href="#" className="transition hover:text-white">
+                        <Link href="/cookies" className="transition hover:text-white">
                             Cookie Policy
                         </Link>
                     </div>
