@@ -5,7 +5,7 @@ import { capabilities } from '@/components/features/data/features';
 export const metadata: Metadata = {
   title: 'Software Development, ERP & Cloud Services',
   description:
-    'OHM Labs Africa provides custom software development, ERP implementation, cloud infrastructure, business intelligence, and AI automation services for organisations ready to scale.',
+    'OHM Labs Africa provides custom software development, ERP implementation, cloud infrastructure, business intelligence and AI automation services for organisations ready to scale.',
   alternates: {
     canonical: '/services',
   },
@@ -88,21 +88,21 @@ export default function ServicesPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-accent">Strategy</p>
             <h2 className="mt-4 text-2xl font-bold text-white">Business-first architecture</h2>
             <p className="mt-4 text-base leading-7 text-brand-text-secondary">
-              We align technology choices to your goals, operational constraints, and growth plans.
+              We align technology choices to your goals, operational constraints and growth plans.
             </p>
           </div>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-accent">Delivery</p>
             <h2 className="mt-4 text-2xl font-bold text-white">Practical and measurable</h2>
             <p className="mt-4 text-base leading-7 text-brand-text-secondary">
-              Every engagement is designed to improve process visibility, reduce friction, and scale with confidence.
+              Every engagement is designed to improve process visibility, reduce friction and scale with confidence.
             </p>
           </div>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-accent">Support</p>
             <h2 className="mt-4 text-2xl font-bold text-white">Long-term partnership</h2>
             <p className="mt-4 text-base leading-7 text-brand-text-secondary">
-              We stay close to your business after launch to optimise adoption, performance, and operational resilience.
+              We stay close to your business after launch to optimise adoption, performance and operational resilience.
             </p>
           </div>
         </div>

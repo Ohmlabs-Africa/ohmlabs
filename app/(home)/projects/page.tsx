@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Project Outcomes & Business Transformations',
   description:
-    'Explore how OHM Labs Africa helps teams modernise operations, unify business systems, build data intelligence, and automate delivery across critical workflows.',
+    'Explore how OHM Labs Africa helps teams modernise operations, unify business systems, build data intelligence and automate delivery across critical workflows.',
   alternates: {
     canonical: '/projects',
   },
@@ -14,7 +14,7 @@ const projects = [
   {
     title: 'Operations platform modernisation',
     summary:
-      'Unified ERP, inventory, and reporting workflows for a growing business with fragmented operational data.',
+      'Unified ERP, inventory and reporting workflows for a growing business with fragmented operational data.',
     impact: 'Reduced manual process overhead and improved reporting visibility across teams.',
   },
   {
@@ -43,7 +43,7 @@ export default function ProjectsPage() {
             Technology built around business outcomes.
           </h1>
           <p className="mt-6 text-lg leading-8 text-brand-text-secondary">
-            We help organisations improve visibility, simplify complexity, and scale their operations through thoughtful technology design and operational delivery.
+            We help organisations improve visibility, simplify complexity and scale their operations through thoughtful technology design and operational delivery.
           </p>
         </div>
       </section>
