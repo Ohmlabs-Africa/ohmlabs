@@ -78,13 +78,6 @@ export function Header() {
             </Link>
 
             <Link
-              href="/solutions"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
-            >
-              Solutions
-            </Link>
-
-            <Link
               href="/contact"
               className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
             >
@@ -158,14 +151,6 @@ export function Header() {
               onClick={() => setMobileOpen(false)}
             >
               Projects
-            </Link>
-
-            <Link
-              href="/solutions"
-              className="rounded-lg px-4 py-3 text-brand-text-secondary transition hover:bg-brand-bg-card hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Solutions
             </Link>
 
             <Link

@@ -1,8 +1,16 @@
 import CalendarBooking from "@/components/contact/calenderBooking";
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: "Book a Discovery Call | OhmLabs",
-  description: "Schedule a complimentary consultation with our technology consultants.",
+export const metadata: Metadata = {
+  title: "Book a Discovery Call | OhmLabs Africa",
+  description: "Schedule a discovery call with OHM Labs Africa to discuss software, ERP, cloud, data, or AI transformation.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/contact/schedule',
+  },
 };
 
 export default function SchedulePage() {

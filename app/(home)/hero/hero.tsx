@@ -198,7 +198,7 @@ export function HeroSection() {
           </Link>
 
           <Link
-            href="/solutions"
+            href="/services"
             className="
               flex
               items-center
@@ -211,7 +211,7 @@ export function HeroSection() {
               hover:text-brand-accent
             "
           >
-            Explore Solutions
+            Explore Services
 
             <span className="text-brand-accent text-lg">
               →

@@ -1,8 +1,16 @@
 import ProposalForm from "@/components/contact/proposalForm"; // Your current proposal component
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: "Request a Proposal | OhmLabs",
+export const metadata: Metadata = {
+  title: "Request a Proposal | OhmLabs Africa",
   description: "Submit your project requirements for a tailored implementation roadmap.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/contact/proposal',
+  },
 };
 
 export default function ProposalPage() {
