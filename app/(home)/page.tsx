@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/app/(home)/hero/hero';
-import { GalleryGrid } from '@/components/layout/gallery';
+import { Partners } from '@/components/layout/partners';
 import FeaturesPlanet from '@/app/(home)/features/features';
 import ProcessTimeline from '@/app/(home)/features/timeline';
 
@@ -19,7 +19,7 @@ export default function LandingPage() {
       <HeroSection />
       <FeaturesPlanet />
       <ProcessTimeline />
-      <GalleryGrid />
+      {/* <Partners  /> */}
     </div>
   );
 }

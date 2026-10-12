@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { TimelineStep } from "./timelineData";
 
 interface TimelineCardProps {
@@ -14,11 +14,12 @@ export default function TimelineCard({
     active,
     left,
 }: TimelineCardProps) {
+    const shouldReduceMotion = useReducedMotion();
     const Icon = step.icon;
 
     return (
         <motion.div
-            initial={{
+            initial={shouldReduceMotion ? false : {
                 opacity: 0,
                 x: left ? -100 : 100,
             }}
@@ -31,10 +32,10 @@ export default function TimelineCard({
                 amount: 0.35,
             }}
             transition={{
-                duration: 0.7,
+                duration: shouldReduceMotion ? 0 : 0.7,
                 ease: "easeOut",
             }}
-            whileHover={{
+            whileHover={shouldReduceMotion ? undefined : {
                 y: -8,
                 transition: {
                     duration: 0.25,
@@ -84,16 +85,16 @@ export default function TimelineCard({
 
                 <motion.div
                     animate={
-                        active
+                        active && !shouldReduceMotion
                             ? {
                                   scale: [1, 1.12, 1],
                                   rotate: [0, 4, -4, 0],
                               }
-                            : {}
+                            : { scale: 1, rotate: 0 }
                     }
                     transition={{
-                        duration: 2,
-                        repeat: Infinity,
+                        duration: shouldReduceMotion ? 0 : 2,
+                        repeat: active && !shouldReduceMotion ? Infinity : 0,
                     }}
                     className="
                         mb-5
