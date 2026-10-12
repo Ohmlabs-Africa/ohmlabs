@@ -27,12 +27,12 @@ export function Header() {
             : 'bg-transparent'
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-18 sm:px-6 lg:h-20 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:h-20 sm:px-8 lg:h-24 lg:px-12">
           {/* Logo */}
 
           <Link
             href="/"
-            className="group flex items-center text-lg font-black sm:text-xl lg:text-2xl"
+            className="group flex items-center text-base font-black tracking-[0.04em] sm:text-lg lg:text-xl"
           >
             <span className="text-white transition-colors duration-300 group-hover:text-brand-text-secondary">
               OHM
@@ -48,38 +48,38 @@ export function Header() {
 
           {/* Desktop Navigation */}
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-7 lg:flex xl:gap-10">
             <Link
               href="/"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
+              className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-text-secondary transition-colors hover:text-white"
             >
               Home
             </Link>
 
             <Link
               href="/about"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
+              className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-text-secondary transition-colors hover:text-white"
             >
               About
             </Link>
 
             <Link
               href="/services"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
+              className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-text-secondary transition-colors hover:text-white"
             >
               Services
             </Link>
 
             <Link
               href="/projects"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
+              className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-text-secondary transition-colors hover:text-white"
             >
               Projects
             </Link>
 
             <Link
               href="/contact"
-              className="text-sm font-medium text-brand-text-secondary transition hover:text-brand-accent"
+              className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-text-secondary transition-colors hover:text-white"
             >
               Contact
             </Link>
@@ -90,9 +90,10 @@ export function Header() {
           <div className="hidden lg:block">
             <Link
               href="/contact"
-              className="rounded-full bg-brand-accent px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-accent-hover hover:scale-105"
+              className="group inline-flex items-center gap-4 rounded-full border border-brand-border-muted px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all hover:border-brand-accent hover:bg-brand-accent"
             >
               Let&apos;s Talk
+              <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
           </div>
 
@@ -101,6 +102,8 @@ export function Header() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="rounded-lg p-2 text-white transition hover:bg-white/10 lg:hidden"
+            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
               <X size={24} />

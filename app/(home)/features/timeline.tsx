@@ -6,6 +6,7 @@ import {
     useScroll,
     useTransform,
     useMotionValueEvent,
+    useReducedMotion,
 } from "framer-motion";
 
 import TimelineCard from "@/components/timeline/timelineCard";
@@ -13,6 +14,7 @@ import { timelineSteps } from "@/components/timeline/timelineData";
 
 export default function ProcessTimeline() {
     const sectionRef = useRef<HTMLDivElement>(null);
+    const shouldReduceMotion = useReducedMotion();
 
     // Track scrolling through this section
     const { scrollYProgress } = useScroll({
@@ -51,23 +53,24 @@ export default function ProcessTimeline() {
                 relative
                 overflow-hidden
                 bg-[var(--color-brand-bg-deep)]
-                py-0
+                py-24
+                sm:py-32
             "
         >
             {/* Header */}
 
             <motion.div
-                initial={{ opacity: 0, y: 40 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: .8 }}
-                className="mx-auto mb-20 max-w-3xl px-6 sm:px-8 lg:px-0 text-center"
+                transition={{ duration: shouldReduceMotion ? 0 : .8 }}
+                className="mx-auto mb-16 max-w-[1440px] px-5 text-left sm:mb-20 sm:px-8 lg:px-12"
             >
-                <p className="mb-4 uppercase tracking-[0.35em] text-[var(--color-brand-accent)]">
+                <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--color-brand-accent)]">
                     OUR PROCESS
                 </p>
 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">
+                <h2 className="max-w-4xl text-[clamp(2.8rem,6vw,6rem)] font-medium leading-[0.95] tracking-[-0.065em] text-white">
                     From Vision
                     <span className="text-[var(--color-brand-accent)]">
                         {" "}
@@ -75,7 +78,7 @@ export default function ProcessTimeline() {
                     </span>
                 </h2>
 
-                <p className="mt-5 text-sm sm:text-base lg:text-lg leading-7 text-[var(--color-brand-text-secondary)]">
+                <p className="mt-6 max-w-2xl text-base leading-7 text-[var(--color-brand-text-secondary)] sm:text-lg sm:leading-8">
                     Every engagement follows a structured,
                     collaborative implementation process that
                     ensures transparency, efficiency and
@@ -85,18 +88,19 @@ export default function ProcessTimeline() {
 
             {/* Timeline */}
 
-            <div className="relative mx-auto max-w-7xl px-8 lg:px-16">
+            <div className="relative mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
 
                 {/* Grey background line */}
 
                 <div
                     className="
                         absolute
-                        left-1/2
+                        left-8
                         top-0
                         h-full
                         w-[4px]
-                        -translate-x-1/2
+                        sm:left-1/2
+                        sm:-translate-x-1/2
                         rounded-full
                         bg-neutral-800
                     "
@@ -108,10 +112,11 @@ export default function ProcessTimeline() {
                     style={{ height: lineHeight }}
                     className="
                         absolute
-                        left-1/2
+                        left-8
                         top-0
                         w-[4px]
-                        -translate-x-1/2
+                        sm:left-1/2
+                        sm:-translate-x-1/2
                         rounded-full
                         bg-[var(--color-brand-accent)]
                     "
@@ -119,7 +124,7 @@ export default function ProcessTimeline() {
 
                 {/* Timeline Steps */}
 
-                <div className="space-y-16">
+                <div className="space-y-10 sm:space-y-16">
 
                     {timelineSteps.map((step, index) => {
 
@@ -135,6 +140,10 @@ export default function ProcessTimeline() {
                                     relative
                                     grid
                                     items-center
+                                    grid-cols-[48px_1fr]
+                                    gap-x-5
+                                    sm:grid-cols-[64px_1fr]
+                                    sm:gap-x-8
                                     lg:grid-cols-[1fr_90px_1fr]
                                 "
                             >
@@ -143,7 +152,7 @@ export default function ProcessTimeline() {
                                 <div
                                     className={`
                                         flex
-                                        ${left ? "justify-end pr-10" : ""}
+                                        ${left ? "col-start-2 row-start-1 lg:col-start-1 lg:row-start-auto lg:justify-end lg:pr-10" : "hidden lg:flex"}
                                     `}
                                 >
                                     {left && (
@@ -157,7 +166,7 @@ export default function ProcessTimeline() {
 
                                 {/* CENTER */}
 
-                                <div className="relative flex justify-center">
+                                <div className="relative col-start-1 row-start-1 flex justify-start sm:justify-center lg:col-start-2 lg:row-start-auto">
 
                                     {/* Animated Node */}
 
@@ -165,7 +174,9 @@ export default function ProcessTimeline() {
 
                                         animate={
                                             active
-                                                ? {
+                                                ? shouldReduceMotion
+                                                  ? { scale: 1 }
+                                                  : {
                                                       scale: [
                                                           1,
                                                           1.15,
@@ -179,16 +190,20 @@ export default function ProcessTimeline() {
 
                                         transition={{
                                             repeat: active
-                                                ? Infinity
+                                                ? shouldReduceMotion
+                                                  ? 0
+                                                  : Infinity
                                                 : 0,
-                                            duration: 1.8,
+                                            duration: shouldReduceMotion ? 0 : 1.8,
                                         }}
 
                                         className={`
                                             z-10
                                             flex
-                                            h-16
-                                            w-16
+                                            h-12
+                                            w-12
+                                            sm:h-16
+                                            sm:w-16
                                             items-center
                                             justify-center
                                             rounded-full
@@ -215,7 +230,7 @@ export default function ProcessTimeline() {
                                 <div
                                     className={`
                                         flex
-                                        ${!left ? "justify-start pl-10" : ""}
+                                        ${!left ? "col-start-2 row-start-1 lg:col-start-3 lg:row-start-auto lg:justify-start lg:pl-10" : "hidden lg:flex"}
                                     `}
                                 >
                                     {!left && (

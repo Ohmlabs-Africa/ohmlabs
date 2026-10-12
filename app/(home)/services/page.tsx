@@ -50,6 +50,7 @@ export default function ServicesPage() {
             return (
               <article
                 key={capability.id}
+                id={capability.id}
                 className="rounded-2xl border border-brand-border bg-brand-bg-main p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
               >
                 <div className="flex items-center justify-between">
