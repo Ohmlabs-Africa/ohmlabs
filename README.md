@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Backend API
 
-Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` to the backend origin (for local development, `http://localhost:4000`). Set the backend's `CLIENT_ORIGIN` to the exact frontend origin so credentialed CORS and the refresh-token cookie work. Configure both origins independently in each deployment.
+Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` to the backend origin (for local development, `http://localhost:4000`). For production, configure it in the hosting provider to the deployed backend's HTTPS URL; do not use localhost, because a visitor's browser would connect to their own machine. The frontend rejects localhost and non-HTTPS API URLs in production builds. Set the backend's `CLIENT_ORIGIN` to the exact frontend origin so credentialed CORS and the refresh-token cookie work. Configure both origins independently in each deployment.
 
 The proposal form posts contact details and structured project fields to `POST /api/contact`; any selected supporting file is uploaded in the same multipart request. Font submissions are available at `/contact/font-submission` and post font/contact fields plus the file to `POST /api/submissions`.
 

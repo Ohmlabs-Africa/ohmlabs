@@ -1,4 +1,29 @@
-const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000").replace(/\/+$/, "");
+function getApiBaseUrl(): string {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  const apiUrl = configuredUrl || (process.env.NODE_ENV === "development" ? "http://localhost:4000" : "");
+
+  if (!apiUrl) {
+    throw new ApiError("The production API URL is not configured. Set NEXT_PUBLIC_API_BASE_URL to the deployed HTTPS API URL.", 0);
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(apiUrl);
+  } catch {
+    throw new ApiError("NEXT_PUBLIC_API_BASE_URL must be a valid absolute URL.", 0);
+  }
+
+  if (!["http:", "https:"].includes(parsedUrl.protocol) || parsedUrl.pathname !== "/" || parsedUrl.search || parsedUrl.hash) {
+    throw new ApiError("NEXT_PUBLIC_API_BASE_URL must contain only an HTTP(S) scheme and hostname.", 0);
+  }
+
+  const isLoopback = ["localhost", "127.0.0.1", "[::1]"].includes(parsedUrl.hostname);
+  if (process.env.NODE_ENV === "production" && (parsedUrl.protocol !== "https:" || isLoopback)) {
+    throw new ApiError("Production must use the deployed HTTPS API URL; localhost is only available in development.", 0);
+  }
+
+  return parsedUrl.origin;
+}
 
 interface ApiResponse<T> {
   success: boolean;
@@ -20,7 +45,7 @@ export async function apiRequest<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${apiBaseUrl}${path}`, {
+    response = await fetch(`${getApiBaseUrl()}${path}`, {
       ...options,
       credentials: "include",
       headers: {
@@ -47,5 +72,5 @@ export async function apiRequest<T>(
 }
 
 export function apiUrl(path: string): string {
-  return `${apiBaseUrl}${path}`;
+  return `${getApiBaseUrl()}${path}`;
 }
