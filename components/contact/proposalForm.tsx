@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
-  FileText,
   Globe,
   Mail,
   Phone,
@@ -16,9 +15,14 @@ import {
   ChevronRight,
   ChevronLeft,
   Check,
-  CornerDownLeft,
   Sparkles,
 } from "lucide-react";
+import { ApiError, apiRequest } from "@/lib/api";
+import {
+  proposalOptions,
+  validateProposalStep,
+  type ProposalErrors,
+} from "@/lib/proposalValidation";
 
 // Initial Form State
 interface FormDataState {
@@ -80,14 +84,30 @@ export default function ProposalForm() {
   const [direction, setDirection] = useState<number>(1);
   const [formData, setFormData] = useState<FormDataState>(initialFormData);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string>("");
+  const [validationErrors, setValidationErrors] = useState<ProposalErrors>({});
+  const [website, setWebsite] = useState("");
 
   const totalSteps = 5;
 
-  const updateField = (field: keyof FormDataState, value: any) => {
+  const updateField = <K extends keyof FormDataState>(field: K, value: FormDataState[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setValidationErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   const toggleServiceOfInterest = (service: string) => {
+    setValidationErrors((prev) => {
+      if (!prev.servicesOfInterest) return prev;
+      const next = { ...prev };
+      delete next.servicesOfInterest;
+      return next;
+    });
     setFormData((prev) => {
       const exists = prev.servicesOfInterest.includes(service);
       return {
@@ -100,11 +120,14 @@ export default function ProposalForm() {
   };
 
   const handleNext = useCallback(() => {
+    const errors = validateProposalStep(currentStep, formData);
+    setValidationErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     if (currentStep < totalSteps - 1) {
       setDirection(1);
       setCurrentStep((prev) => prev + 1);
     }
-  }, [currentStep, totalSteps]);
+  }, [currentStep, formData, totalSteps]);
 
   const handlePrev = useCallback(() => {
     if (currentStep > 0) {
@@ -132,9 +155,56 @@ export default function ProposalForm() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentStep, handleNext, handlePrev, totalSteps]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    const errors: ProposalErrors = {};
+    let firstInvalidStep: number | undefined;
+    for (let step = 0; step < totalSteps; step += 1) {
+      const stepErrors = validateProposalStep(step, formData);
+      Object.assign(errors, stepErrors);
+      if (firstInvalidStep === undefined && Object.keys(stepErrors).length > 0) firstInvalidStep = step;
+    }
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      if (firstInvalidStep !== undefined && firstInvalidStep !== currentStep) {
+        setDirection(firstInvalidStep > currentStep ? 1 : -1);
+        setCurrentStep(firstInvalidStep);
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    const payload = new FormData();
+    payload.set("name", formData.fullName.trim());
+    payload.set("email", formData.email.trim());
+    payload.set("company", formData.companyName.trim());
+    payload.set("message", formData.projectDescription.trim() || "Proposal request");
+    payload.set("website", website);
+    payload.set("details", JSON.stringify({
+      jobTitle: formData.jobTitle.trim(),
+      phone: formData.phone.trim(),
+      country: formData.country.trim(),
+      industry: formData.industry,
+      companySize: formData.companySize,
+      serviceRequired: formData.serviceRequired,
+      estimatedBudget: formData.estimatedBudget,
+      preferredTimeline: formData.preferredTimeline,
+      expectedGoLive: formData.expectedGoLive,
+      servicesOfInterest: formData.servicesOfInterest,
+      projectDescription: formData.projectDescription.trim(),
+    }));
+    if (formData.file) payload.set("attachment", formData.file);
+
+    try {
+      await apiRequest("/api/contact", { method: "POST", body: payload });
+      setIsSubmitted(true);
+    } catch (error) {
+      setSubmitError(error instanceof ApiError ? error.message : "Your proposal could not be submitted. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -170,6 +240,17 @@ export default function ProposalForm() {
           transition={{ duration: 0.35, ease: "easeInOut" }}
         />
       </div>
+      <div aria-hidden="true" className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden">
+        <label htmlFor="proposal-website">Leave this field empty</label>
+        <input
+          id="proposal-website"
+          name="website"
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
 
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
@@ -203,10 +284,10 @@ export default function ProposalForm() {
             >
               <div>
                 <h2 className="text-2xl font-bold text-[var(--color-brand-text-primary)] md:text-xl">
-                  Let's start with your contact info 
+                  Let&apos;s start with your contact info
                 </h2>
                 <p className="mt-1 text-sm text-[var(--color-brand-text-muted)]">
-                  Please share who we'll be presenting this proposal to.
+                  Please share who we&apos;ll be presenting this proposal to.
                 </p>
               </div>
 
@@ -214,32 +295,51 @@ export default function ProposalForm() {
                 <Input
                   icon={<User size={18} />}
                   label="Full Name *"
+                  id="proposal-name"
+                  autoComplete="name"
+                  maxLength={120}
+                  required
                   placeholder="e.g. Sarah Jenkins"
                   value={formData.fullName}
                   onChange={(e) => updateField("fullName", e.target.value)}
                   autoFocus
+                  error={validationErrors.fullName}
                 />
                 <Input
                   icon={<Briefcase size={18} />}
                   label="Job Title"
+                  id="proposal-job-title"
+                  maxLength={100}
                   placeholder="e.g. Chief Technology Officer"
                   value={formData.jobTitle}
                   onChange={(e) => updateField("jobTitle", e.target.value)}
+                  error={validationErrors.jobTitle}
                 />
                 <Input
                   icon={<Mail size={18} />}
                   type="email"
                   label="Email Address *"
+                  id="proposal-email"
+                  autoComplete="email"
+                  maxLength={254}
+                  required
                   placeholder="sarah@company.com"
                   value={formData.email}
                   onChange={(e) => updateField("email", e.target.value)}
+                  error={validationErrors.email}
                 />
                 <Input
                   icon={<Phone size={18} />}
                   label="Phone Number"
+                  id="proposal-phone"
+                  type="tel"
+                  autoComplete="tel"
+                  maxLength={30}
+                  inputMode="tel"
                   placeholder="+254 700 000 000"
                   value={formData.phone}
                   onChange={(e) => updateField("phone", e.target.value)}
+                  error={validationErrors.phone}
                 />
               </div>
             </motion.div>
@@ -269,40 +369,43 @@ export default function ProposalForm() {
                 <Input
                   icon={<Building2 size={18} />}
                   label="Company Name"
+                  id="proposal-company"
+                  autoComplete="organization"
+                  maxLength={160}
                   placeholder="e.g. Acme Corp"
                   value={formData.companyName}
                   onChange={(e) => updateField("companyName", e.target.value)}
                   autoFocus
+                  error={validationErrors.companyName}
                 />
                 <Input
                   icon={<Globe size={18} />}
                   label="Country / Region"
+                  id="proposal-country"
+                  autoComplete="country-name"
+                  maxLength={100}
                   placeholder="e.g. Kenya"
                   value={formData.country}
                   onChange={(e) => updateField("country", e.target.value)}
+                  error={validationErrors.country}
                 />
                 
                 <Select
                   label="Industry"
+                  id="proposal-industry"
                   value={formData.industry}
                   onChange={(e) => updateField("industry", e.target.value)}
-                  options={[
-                    "Retail & E-commerce",
-                    "Healthcare & Pharma",
-                    "Manufacturing & Industrial",
-                    "Finance & Banking",
-                    "Technology & SaaS",
-                    "Logistics & Supply Chain",
-                    "Government & NGO",
-                    "Other",
-                  ]}
+                  options={proposalOptions.industry}
+                  error={validationErrors.industry}
                 />
 
                 <Select
                   label="Company Size"
+                  id="proposal-company-size"
                   value={formData.companySize}
                   onChange={(e) => updateField("companySize", e.target.value)}
-                  options={["1 - 10", "11 - 50", "51 - 200", "201 - 500", "500+ employees"]}
+                  options={proposalOptions.companySize}
+                  error={validationErrors.companySize}
                 />
               </div>
             </motion.div>
@@ -331,51 +434,41 @@ export default function ProposalForm() {
               <div className="grid gap-4 md:grid-cols-2">
                 <Select
                   label="Primary Service Required"
+                  id="proposal-service"
                   value={formData.serviceRequired}
                   onChange={(e) => updateField("serviceRequired", e.target.value)}
-                  options={[
-                    "Artificial Intelligence & ML",
-                    "Business Intelligence & Data Analytics",
-                    "ERP (Odoo) Implementation",
-                    "Cloud Migration & Architecture",
-                    "Custom Software Development",
-                    "Digital Transformation",
-                  ]}
+                  options={proposalOptions.serviceRequired}
+                  error={validationErrors.serviceRequired}
                 />
 
                 <Select
                   label="Estimated Budget Range"
+                  id="proposal-budget"
                   value={formData.estimatedBudget}
                   onChange={(e) => updateField("estimatedBudget", e.target.value)}
-                  options={[
-                    "Under $2,000",
-                    "$2,000 - $5,000",
-                    "$5,000 - $10,000",
-                    "$10,000 - $25,000",
-                    "$25,000+",
-                  ]}
+                  options={proposalOptions.estimatedBudget}
+                  error={validationErrors.estimatedBudget}
                 />
 
                 <Select
                   label="Preferred Timeline"
+                  id="proposal-timeline"
                   value={formData.preferredTimeline}
                   onChange={(e) => updateField("preferredTimeline", e.target.value)}
-                  options={[
-                    "Immediately",
-                    "Within 30 Days",
-                    "1 - 3 Months",
-                    "3 - 6 Months",
-                    "Flexible / Planning Stage",
-                  ]}
+                  options={proposalOptions.preferredTimeline}
+                  error={validationErrors.preferredTimeline}
                 />
 
                 <Input
                   icon={<Clock size={18} />}
                   label="Target Go-Live Date"
+                  id="proposal-go-live"
                   type="date"
                   value={formData.expectedGoLive}
                   onChange={(e) => updateField("expectedGoLive", e.target.value)}
                   placeholder=""
+                  min={new Date().toISOString().slice(0, 10)}
+                  error={validationErrors.expectedGoLive}
                 />
               </div>
             </motion.div>
@@ -402,20 +495,7 @@ export default function ProposalForm() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {[
-                  "AI Solutions",
-                  "Machine Learning",
-                  "Business Intelligence",
-                  "Cloud Computing",
-                  "ERP (Odoo)",
-                  "Microsoft Fabric",
-                  "Azure",
-                  "Data Warehousing",
-                  "Web Applications",
-                  "Mobile Applications",
-                  "Automation",
-                  "Managed Support",
-                ].map((item) => {
+                {proposalOptions.servicesOfInterest.map((item) => {
                   const isSelected = formData.servicesOfInterest.includes(item);
                   return (
                     <button
@@ -442,6 +522,9 @@ export default function ProposalForm() {
                   );
                 })}
               </div>
+              {validationErrors.servicesOfInterest && (
+                <p role="alert" className="text-sm text-red-400">{validationErrors.servicesOfInterest}</p>
+              )}
             </motion.div>
           )}
 
@@ -471,13 +554,22 @@ export default function ProposalForm() {
                     Project Description
                   </label>
                   <textarea
+                    id="proposal-description"
                     rows={4}
+                    maxLength={5000}
                     value={formData.projectDescription}
                     onChange={(e) => updateField("projectDescription", e.target.value)}
                     placeholder="Briefly describe your objectives, existing stack, users, or challenges..."
                     className="w-full rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] p-4 text-sm text-[var(--color-brand-text-primary)] placeholder-[var(--color-brand-text-muted)] outline-none transition focus:border-[var(--color-brand-accent)]"
                     autoFocus
+                    aria-invalid={Boolean(validationErrors.projectDescription)}
+                    aria-describedby={validationErrors.projectDescription ? "proposal-description-error" : undefined}
                   />
+                  {validationErrors.projectDescription && (
+                    <p id="proposal-description-error" role="alert" className="mt-2 text-sm text-red-400">
+                      {validationErrors.projectDescription}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -495,10 +587,18 @@ export default function ProposalForm() {
                     </p>
                     <input
                       type="file"
-                      onChange={(e) => updateField("file", e.target.files?.[0] || null)}
+                      id="proposal-attachment"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        updateField("file", file);
+                        const errors = validateProposalStep(4, { ...formData, file });
+                        if (errors.file) setValidationErrors((prev) => ({ ...prev, file: errors.file }));
+                      }}
                       className="absolute inset-0 cursor-pointer opacity-0"
                     />
                   </div>
+                  {validationErrors.file && <p role="alert" className="mt-2 text-sm text-red-400">{validationErrors.file}</p>}
                 </div>
               </div>
             </motion.div>
@@ -538,13 +638,19 @@ export default function ProposalForm() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-accent)] px-6 py-2.5 text-xs font-semibold text-white shadow-lg transition hover:bg-[var(--color-brand-accent-hover)] active:scale-95"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-accent)] px-6 py-2.5 text-xs font-semibold text-white shadow-lg transition hover:bg-[var(--color-brand-accent-hover)] active:scale-95 disabled:cursor-wait disabled:opacity-60"
             >
-              Submit Proposal <Send size={14} />
+              {isSubmitting ? "Submitting..." : "Submit Proposal"} <Send size={14} />
             </button>
           )}
         </div>
       </div>
+      {submitError && (
+        <p role="alert" className="mt-4 text-right text-sm text-red-400">
+          {submitError}
+        </p>
+      )}
     </div>
   );
 }
@@ -553,21 +659,25 @@ export default function ProposalForm() {
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon: React.ReactNode;
   label: string;
+  error?: string;
 }
 
-function Input({ icon, label, ...props }: InputProps) {
+function Input({ icon, label, error, ...props }: InputProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-text-secondary)]">
+      <label htmlFor={props.id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-text-secondary)]">
         {label}
       </label>
       <div className="flex items-center gap-3 rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] px-3.5 py-2.5 transition focus-within:border-[var(--color-brand-accent)]">
         <div className="text-[var(--color-brand-accent)]">{icon}</div>
         <input
           {...props}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${props.id}-error` : undefined}
           className="w-full bg-transparent text-sm text-[var(--color-brand-text-primary)] placeholder-[var(--color-brand-text-muted)] outline-none"
         />
       </div>
+      {error && <p id={`${props.id}-error`} role="alert" className="mt-1.5 text-xs text-red-400">{error}</p>}
     </div>
   );
 }
@@ -575,17 +685,20 @@ function Input({ icon, label, ...props }: InputProps) {
 /* Helper Reusable Select Component */
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
-  options: string[];
+  options: readonly string[];
+  error?: string;
 }
 
-function Select({ label, options, ...props }: SelectProps) {
+function Select({ label, options, error, ...props }: SelectProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-text-secondary)]">
+      <label htmlFor={props.id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-text-secondary)]">
         {label}
       </label>
       <select
         {...props}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${props.id}-error` : undefined}
         className="w-full rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] px-3.5 py-3 text-sm text-[var(--color-brand-text-primary)] outline-none transition focus:border-[var(--color-brand-accent)]"
       >
         <option value="" disabled className="bg-[var(--color-brand-bg-deep)] text-[var(--color-brand-text-muted)]">
@@ -601,7 +714,7 @@ function Select({ label, options, ...props }: SelectProps) {
           </option>
         ))}
       </select>
+      {error && <p id={`${props.id}-error`} role="alert" className="mt-1.5 text-xs text-red-400">{error}</p>}
     </div>
   );
 }
-

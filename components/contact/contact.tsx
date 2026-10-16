@@ -34,7 +34,7 @@ export default function ContactHero() {
           <ChevronRight size={16} />
 
           <span className="text-white">
-            Let's Talk
+            Let&apos;s Talk
           </span>
         </motion.div>
 
@@ -52,11 +52,11 @@ export default function ContactHero() {
             </span>
 
             <h1 className="mt-6 max-w-xl text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-4xl">
-              Let's build your next digital success story.
+              Let&apos;s build your next digital success story.
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-8 text-[var(--color-brand-text-secondary)] sm:text-sm">
-              Whether you're looking to modernize your business,
+              Whether you&apos;re looking to modernize your business,
               automate operations, develop enterprise software,
               build AI-powered solutions, or migrate to the cloud,
               OHM Labs Africa is ready to partner with you from
@@ -78,6 +78,13 @@ export default function ContactHero() {
                 className="inline-flex items-center rounded-xl border border-white/10 px-8 py-4 text-sm font-semibold text-white transition hover:border-[var(--color-brand-accent)] hover:bg-white/5"
               >
                 Book a Strategy Call
+              </Link>
+
+              <Link
+                href="/contact/font-submission"
+                className="inline-flex items-center rounded-xl border border-white/10 px-8 py-4 text-sm font-semibold text-white transition hover:border-[var(--color-brand-accent)] hover:bg-white/5"
+              >
+                Submit a Font
               </Link>
 
             </div>
