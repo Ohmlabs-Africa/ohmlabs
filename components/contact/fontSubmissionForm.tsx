@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ApiError, apiRequest } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function FontSubmissionForm() {
   const [name, setName] = useState("");
@@ -33,8 +34,11 @@ export default function FontSubmissionForm() {
     try {
       await apiRequest("/api/submissions", { method: "POST", body: payload });
       setSubmitted(true);
+      toast.success("Your font submission was received.");
     } catch (submitError) {
-      setError(submitError instanceof ApiError ? submitError.message : "Your font could not be submitted. Please try again.");
+      const message = submitError instanceof ApiError ? submitError.message : "Your font could not be submitted. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

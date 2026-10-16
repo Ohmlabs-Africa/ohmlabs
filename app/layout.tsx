@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -108,6 +109,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`antialiased selection:bg-indigo-500/30 ${montserrat.variable}`}>
         {children}
+        <Toaster position="top-right" richColors theme="dark" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

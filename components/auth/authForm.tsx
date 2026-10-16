@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiError, apiRequest } from "@/lib/api";
+import { toast } from "sonner";
 
 type AuthMode = "login" | "forgot-password" | "reset-password";
 
@@ -17,14 +18,12 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    setMessage("");
     setIsSubmitting(true);
 
     try {
@@ -42,6 +41,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
           return;
         }
         sessionStorage.setItem("ohmlabs_access_token", result.accessToken);
+        toast.success("Signed in successfully.");
         router.push("/dashboard");
         return;
       }
@@ -51,7 +51,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
           method: "POST",
           body: JSON.stringify({ email }),
         });
-        setMessage("If an account exists for that email, a password reset link will be sent.");
+        toast.success("If an account exists for that email, a password reset link will be sent.");
         return;
       }
 
@@ -64,9 +64,11 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
         method: "POST",
         body: JSON.stringify({ token, password }),
       });
-      setMessage("Your password has been reset. You can now sign in.");
+      toast.success("Your password has been reset. You can now sign in.");
     } catch (submitError) {
-      setError(submitError instanceof ApiError ? submitError.message : "The request could not be completed. Please try again.");
+      const message = submitError instanceof ApiError ? submitError.message : "The request could not be completed. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -105,7 +107,6 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
           </label>
         )}
         {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
-        {message && <p role="status" className="text-sm text-emerald-400">{message}</p>}
         <button
           type="submit"
           disabled={isSubmitting}
