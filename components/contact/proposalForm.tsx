@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ApiError, apiRequest } from "@/lib/api";
+import { toast } from "sonner";
 import {
   proposalOptions,
   validateProposalStep,
@@ -198,10 +199,17 @@ export default function ProposalForm() {
     if (formData.file) payload.set("attachment", formData.file);
 
     try {
-      await apiRequest("/api/contact", { method: "POST", body: payload });
+      const result = await apiRequest<{ notificationSent?: boolean }>("/api/contact", { method: "POST", body: payload });
+      if (result.notificationSent === false) {
+        toast.warning("Your proposal was received, but the email notification could not be delivered.");
+      } else {
+        toast.success("Your proposal was received. We’ll be in touch soon.");
+      }
       setIsSubmitted(true);
     } catch (error) {
-      setSubmitError(error instanceof ApiError ? error.message : "Your proposal could not be submitted. Please try again.");
+      const message = error instanceof ApiError ? error.message : "Your proposal could not be submitted. Please try again.";
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
