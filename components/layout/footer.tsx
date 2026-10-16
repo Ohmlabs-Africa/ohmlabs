@@ -48,6 +48,7 @@ const company = [
     { label: "Projects", href: "/projects" },
     { label: "Contact", href: "/contact" },
     { label: "Solutions", href: "/solutions" },
+    { label: "Admin", href: "/login" },
 ];
 
 const services = [
