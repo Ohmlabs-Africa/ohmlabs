@@ -90,7 +90,11 @@ export function Header() {
           <div className="hidden lg:block">
             <Link
               href="/contact"
-              className="group inline-flex items-center gap-4 rounded-full border border-brand-border-muted px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all hover:border-brand-accent hover:bg-brand-accent"
+              className="group inline-flex items-center gap-4 rounded-full border border-brand-border-muted px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all  duration-300
+              bg-brand-accent
+              hover:scale-105
+              hover:bg-brand-accent-hover
+              sm:w-auto"
             >
               Let&apos;s Talk
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>

@@ -277,7 +277,7 @@ export default function ProposalForm() {
       </div>
 
       {/* Step Content Area */}
-      <div className="relative flex-1 flex flex-col justify-center pb-4 pt-1">
+      <div className="relative flex-1 flex flex-col justify-center pb-4 pt-0">
         <AnimatePresence mode="wait" custom={direction}>
           {currentStep === 0 && (
             <motion.div

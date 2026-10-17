@@ -187,7 +187,6 @@ export function HeroSection() {
               shadow-xl
               transition-all
               duration-300
-
               hover:scale-105
               hover:bg-brand-accent-hover
 
