@@ -11,6 +11,7 @@ import {
   Clock3,
   ExternalLink,
   FileText,
+  FolderKanban,
   Inbox,
   LayoutDashboard,
   LogOut,
@@ -21,6 +22,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
@@ -28,6 +30,7 @@ import { toast } from "sonner";
 import { ApiError, apiRequest, apiUrl } from "@/lib/api";
 
 type SubmissionStatus = "new" | "in_progress" | "closed";
+type ProjectTaskStatus = "todo" | "in_progress" | "in_review" | "blocked" | "completed";
 type SubmissionType = "contact" | "font_submission" | "calendar_booking";
 type StatusFilter = "all" | SubmissionStatus;
 type TypeFilter = "all" | SubmissionType;
@@ -67,6 +70,23 @@ interface Submission {
   createdAt: string;
 }
 
+interface PendingAccount {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
+interface AssignedProjectTask {
+  _id: string;
+  title: string;
+  description: string;
+  status: ProjectTaskStatus;
+  priority: "low" | "normal" | "high" | "urgent";
+  dueDate?: string;
+  project: { _id: string; name: string; status: string };
+}
+
 const pageSize = 10;
 const dashboardPalette: CSSProperties & Record<string, string> = {
   "--color-slate-100": "var(--color-brand-text-primary)",
@@ -100,6 +120,8 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [pendingAccounts, setPendingAccounts] = useState<PendingAccount[]>([]);
+  const [assignedProjectTasks, setAssignedProjectTasks] = useState<AssignedProjectTask[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -126,11 +148,13 @@ export default function AdminDashboard() {
 
   const loadDashboard = useCallback(async (token: string) => {
     const headers = { Authorization: `Bearer ${token}` };
-    const [statsResult, submissionResult] = await Promise.all([
+    const [statsResult, submissionResult, pendingResult, projectTaskResult] = await Promise.all([
       apiRequest<DashboardStats>("/api/admin/dashboard/stats", { headers }),
       apiRequest<Submission[]>("/api/admin/submissions", { headers }),
+      apiRequest<PendingAccount[]>("/api/admin/users/pending", { headers }),
+      apiRequest<AssignedProjectTask[]>("/api/admin/project-tasks/assigned-to-me", { headers }),
     ]);
-    return [statsResult, submissionResult] as const;
+    return [statsResult, submissionResult, pendingResult, projectTaskResult] as const;
   }, []);
 
   useEffect(() => {
@@ -151,6 +175,8 @@ export default function AdminDashboard() {
         if (!cancelled) {
           setStats(data[0]);
           setSubmissions(data[1]);
+          setPendingAccounts(data[2]);
+          setAssignedProjectTasks(data[3]);
           setIsAuthorized(true);
         }
       } catch (loadError) {
@@ -224,6 +250,59 @@ export default function AdminDashboard() {
     }
   }
 
+  async function updateAccountApproval(account: PendingAccount, approvalStatus: "approved" | "rejected") {
+    try {
+      const token = await getAdminToken();
+      const result = await apiRequest<{ user: PendingAccount; notificationSent: boolean }>(`/api/admin/users/${account.id}/approval`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ approvalStatus }),
+      });
+      setPendingAccounts((current) => current.filter((user) => user.id !== account.id));
+      toast.success(approvalStatus === "approved" ? `${account.name} was approved.` : `${account.name}'s request was rejected.`);
+      if (!result.notificationSent) toast.warning("The account decision was saved, but the user notification email could not be sent.");
+    } catch (approvalError) {
+      const message = approvalError instanceof ApiError ? approvalError.message : "The account decision could not be saved.";
+      setError(message);
+      toast.error(message);
+    }
+  }
+
+  async function updateProjectTaskStatus(task: AssignedProjectTask, status: ProjectTaskStatus) {
+    if (task.status === status) return;
+    try {
+      let token = await getAdminToken();
+      let updated: AssignedProjectTask;
+      try {
+        updated = await apiRequest<AssignedProjectTask>(`/api/admin/projects/${task.project._id}/tasks/${task._id}`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ status }),
+        });
+      } catch (requestError) {
+        if (!(requestError instanceof ApiError) || requestError.status !== 401) throw requestError;
+        const refreshed = await apiRequest<{ accessToken: string }>("/api/auth/refresh", { method: "POST" });
+        token = refreshed.accessToken;
+        sessionStorage.setItem("ohmlabs_access_token", token);
+        updated = await apiRequest<AssignedProjectTask>(`/api/admin/projects/${task.project._id}/tasks/${task._id}`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ status }),
+        });
+      }
+      setAssignedProjectTasks((current) => current.map((item) => item._id === task._id ? { ...item, ...updated, project: task.project } : item));
+      toast.success("Project task updated. Project members can see the change.");
+    } catch (taskError) {
+      const message = taskError instanceof ApiError ? taskError.message : "The project task could not be updated.";
+      setError(message);
+      toast.error(message);
+      if (taskError instanceof ApiError && (taskError.status === 401 || taskError.status === 403)) {
+        sessionStorage.removeItem("ohmlabs_access_token");
+        router.replace("/login");
+      }
+    }
+  }
+
   async function downloadAttachment(submission: Submission, storageKey: string, fileName: string) {
     const token = sessionStorage.getItem("ohmlabs_access_token");
     if (!token) {
@@ -275,8 +354,15 @@ export default function AdminDashboard() {
     { label: "Total submissions", value: stats.submissions.total, detail: "All received records", icon: Inbox },
     { label: "Active users", value: stats.users.active, detail: `${stats.users.total} total accounts`, icon: Users },
     { label: "Sign-ins today", value: stats.signins.today, detail: `${stats.signins.last30Days} in the last 30 days`, icon: Activity },
-    { label: "New to review", value: newCount, detail: "Currently marked as new", icon: Clock3 },
+    { label: "My open project tasks", value: assignedProjectTasks.filter((task) => task.status !== "completed").length, detail: "Assigned to your admin account", icon: Clock3 },
   ] : [];
+  const projectTaskStatuses: Array<{ value: ProjectTaskStatus; label: string }> = [
+    { value: "todo", label: "To do" },
+    { value: "in_progress", label: "In progress" },
+    { value: "in_review", label: "In review" },
+    { value: "blocked", label: "Blocked" },
+    { value: "completed", label: "Completed" },
+  ];
 
   if (isLoading || !isAuthorized) {
     return (
@@ -380,6 +466,9 @@ export default function AdminDashboard() {
               <h1 className="text-base font-semibold text-white">Overview</h1>
             </div>
             <div className="flex items-center gap-3">
+              <Link href="/admin/projects" className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-border-muted)] px-2.5 py-2 text-sm text-slate-300 transition-colors hover:border-[var(--color-brand-accent)] hover:text-white sm:px-3">
+                <FolderKanban size={16} /> <span className="hidden sm:inline">Projects</span>
+              </Link>
               <button
                 onClick={() => {
                   setStatusFilter("new");
@@ -429,6 +518,82 @@ export default function AdminDashboard() {
                 </article>
               ))}
             </div>
+
+            <section aria-labelledby="my-project-work-heading" className="mt-6 overflow-hidden rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-card)]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-brand-border)] px-5 py-4">
+                <div>
+                  <h2 id="my-project-work-heading" className="text-base font-semibold text-white">My project work</h2>
+                  <p className="mt-1 text-sm text-slate-500">Tasks assigned to you are shared with the project team.</p>
+                </div>
+                <Link href="/admin/projects" className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-border-muted)] px-3 py-2 text-xs font-medium text-slate-300 hover:border-[var(--color-brand-accent)] hover:text-white">
+                  <FolderKanban size={15} /> Manage projects
+                </Link>
+              </div>
+              {assignedProjectTasks.length === 0 ? (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-sm font-medium text-white">No tasks assigned to you yet</p>
+                  <p className="mt-1 text-xs text-slate-500">Join a project and a client or admin can assign work to your account.</p>
+                  <Link href="/admin/projects" className="mt-3 inline-flex text-sm font-medium text-[var(--color-brand-accent-glow)] hover:text-white">Open project workspace</Link>
+                </div>
+              ) : (
+                <ul className="divide-y divide-[var(--color-brand-border)]">
+                  {[...assignedProjectTasks]
+                    .sort((left, right) => {
+                      if ((left.status === "completed") !== (right.status === "completed")) return left.status === "completed" ? 1 : -1;
+                      return new Date(left.dueDate || "9999-12-31").getTime() - new Date(right.dueDate || "9999-12-31").getTime();
+                    })
+                    .slice(0, 8)
+                    .map((task) => (
+                      <li key={task._id} className="flex flex-wrap items-center gap-3 px-5 py-3">
+                        <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${task.status === "completed" ? "bg-emerald-400" : task.status === "blocked" ? "bg-red-400" : "bg-[var(--color-brand-accent)]"}`} />
+                        <div className="min-w-[160px] flex-1">
+                          <p className="text-sm font-medium text-white">{task.title}</p>
+                          <Link href={`/admin/projects?project=${encodeURIComponent(task.project._id)}`} className="mt-1 inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white">
+                            {task.project.name} <ExternalLink size={12} />
+                          </Link>
+                        </div>
+                        <span className="text-xs text-slate-500">{task.dueDate ? `Due ${new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(task.dueDate))}` : "No due date"}</span>
+                        <label className="sr-only" htmlFor={`admin-project-task-${task._id}`}>Update status for {task.title}</label>
+                        <select
+                          id={`admin-project-task-${task._id}`}
+                          value={task.status}
+                          onChange={(event) => void updateProjectTaskStatus(task, event.target.value as ProjectTaskStatus)}
+                          className="rounded-lg border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] px-2.5 py-1.5 text-xs text-slate-300 outline-none focus:border-[var(--color-brand-accent)]"
+                        >
+                          {projectTaskStatuses.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+                        </select>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </section>
+
+            {pendingAccounts.length > 0 && (
+              <section aria-labelledby="pending-accounts-heading" className="mt-6 overflow-hidden rounded-xl border border-amber-400/20 bg-[var(--color-brand-bg-card)]">
+                <div className="flex items-center justify-between border-b border-[var(--color-brand-border)] px-5 py-4">
+                  <div>
+                    <h2 id="pending-accounts-heading" className="text-base font-semibold text-white">Account requests</h2>
+                    <p className="mt-1 text-sm text-slate-500">{pendingAccounts.length} client account{pendingAccounts.length === 1 ? "" : "s"} waiting for approval</p>
+                  </div>
+                  <span className="rounded-full bg-amber-400/10 px-2.5 py-1 text-xs text-amber-200">{pendingAccounts.length} pending</span>
+                </div>
+                <ul className="divide-y divide-[var(--color-brand-border)]">
+                  {pendingAccounts.map((account) => (
+                    <li key={account.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-white">{account.name}</p>
+                        <a href={`mailto:${account.email}`} className="mt-1 block truncate text-xs text-slate-400 hover:text-white">{account.email}</a>
+                        <p className="mt-1 text-xs text-slate-500">Requested {formatDate(account.createdAt)}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => void updateAccountApproval(account, "rejected")} className="rounded-lg border border-[var(--color-brand-border-muted)] px-3 py-2 text-xs text-slate-300 hover:bg-white/5">Reject</button>
+                        <button onClick={() => void updateAccountApproval(account, "approved")} className="rounded-lg bg-[var(--color-brand-accent)] px-3 py-2 text-xs font-medium text-white hover:bg-[var(--color-brand-accent-hover)]">Approve</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)]">
               <section id="submissions" aria-labelledby="submissions-heading" className="scroll-mt-24 overflow-hidden rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-card)]">

@@ -49,6 +49,8 @@ const company = [
     { label: "Contact", href: "/contact" },
     { label: "Solutions", href: "/solutions" },
     { label: "Admin", href: "/login" },
+    { label: "Client sign in", href: "/client/login" },
+    { label: "Create client account", href: "/client/register" },
 ];
 
 const services = [
