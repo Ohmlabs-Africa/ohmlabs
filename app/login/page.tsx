@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-[70vh] bg-[var(--color-brand-bg-main)] px-4 py-16">
+    <main className="grid min-h-screen place-items-center bg-[var(--color-brand-bg-deep)] px-4 py-16">
       <AuthForm mode="login" />
     </main>
   );
