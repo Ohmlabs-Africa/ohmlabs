@@ -2,14 +2,21 @@ import { capabilities } from '@/components/features/data/features';
 
 export default function FeaturesPlanet() {
   return (
-    <section id="capabilities" className="border-t border-brand-border bg-brand-bg-deep py-24 sm:py-32 lg:py-40">
-      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+    <section
+      id="capabilities"
+      className="relative isolate overflow-hidden border-t border-brand-border bg-brand-bg-deep bg-[url('/Collage.png')] bg-cover bg-[center_42%] py-16 sm:py-20 lg:py-24 max-sm:bg-[center_38%]"
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(20,20,20,0.92)_0%,rgba(20,20,20,0.88)_45%,rgba(20,20,20,0.95)_100%)]"
+      />
+      <div className="relative z-10 mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <div className="grid gap-8 border-b border-brand-border pb-14 lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:pb-20">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand-accent">
             Our Specialty
             </p>
-            <h2 className="mt-6 max-w-5xl text-[clamp(2.8rem,6vw,6rem)] font-medium leading-[0.95] tracking-[-0.065em] text-brand-text-primary">
+            <h2 className="mt-6 max-w-5xl text-[clamp(2.25rem,5.5vw,5rem)] font-medium leading-[0.98] tracking-[-0.06em] text-brand-text-primary">
               Built to move ambitious organisations forward
             </h2>
           </div>
