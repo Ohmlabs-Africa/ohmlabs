@@ -51,12 +51,21 @@ export default function ProcessTimeline() {
             ref={sectionRef}
             className="
                 relative
+                isolate
                 overflow-hidden
                 bg-[var(--color-brand-bg-deep)]
+                bg-[url('/Collage.png')]
+                bg-cover
+                bg-[center_42%]
                 py-24
                 sm:py-32
             "
         >
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(20,20,20,0.92)_0%,rgba(20,20,20,0.88)_45%,rgba(20,20,20,0.95)_100%)]"
+            />
+            <div className="relative z-10">
             {/* Header */}
 
             <motion.div
@@ -250,6 +259,7 @@ export default function ProcessTimeline() {
 
                 </div>
 
+            </div>
             </div>
 
         </section>
