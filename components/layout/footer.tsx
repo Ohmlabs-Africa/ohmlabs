@@ -49,8 +49,8 @@ const company = [
     { label: "Contact", href: "/contact" },
     { label: "Solutions", href: "/solutions" },
     { label: "Admin", href: "/login" },
-    { label: "Client sign in", href: "/client/login" },
-    { label: "Create client account", href: "/client/register" },
+    { label: "Sign in", href: "/client/login" },
+    { label: "Register account", href: "/client/register" },
 ];
 
 const services = [
@@ -65,7 +65,7 @@ const services = [
 
 export default function Footer() {
     return (
-        <footer className="relative overflow-hidden border-t border-[var(--color-brand-border)] bg-[var(--color-brand-bg-deep)]">
+        <footer className="relative isolate overflow-hidden border-t border-[var(--color-brand-border)] bg-[var(--color-brand-bg-deep)] bg-[url('/Collage.png')] bg-cover bg-[center_42%]">
 
             {/* Animated top line
             <motion.div
@@ -76,10 +76,15 @@ export default function Footer() {
                 className="h-1 bg-[var(--color-brand-accent)]"
             /> */}
 
-            {/* Background Blur */}
-            <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-[var(--color-brand-accent)] opacity-5 blur-[150px]" />
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(20,20,20,0.92)_0%,rgba(20,20,20,0.88)_45%,rgba(20,20,20,0.95)_100%)]"
+            />
 
-            <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-12">
+            {/* Background Blur */}
+            <div className="absolute left-1/2 top-0 z-0 h-96 w-96 -translate-x-1/2 rounded-full bg-[var(--color-brand-accent)] opacity-5 blur-[150px]" />
+
+            <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:px-12">
 
                 <div className="grid gap-12 lg:grid-cols-4">
 
