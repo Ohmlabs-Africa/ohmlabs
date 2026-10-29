@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Script from "next/script";
 import {
   Clock3,
   Video,
@@ -11,8 +12,24 @@ import {
   ChevronLeft,
   Mail,
   Sparkles,
-  CalendarDays,
 } from "lucide-react";
+
+function getCalendlyUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_CALENDLY_URL?.trim();
+  if (!configuredUrl) return null;
+
+  try {
+    const url = new URL(configuredUrl);
+    if (url.protocol !== "https:" || !(url.hostname === "calendly.com" || url.hostname.endsWith(".calendly.com"))) {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+const calendlyUrl = getCalendlyUrl();
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -47,17 +64,6 @@ export default function CalendarBooking() {
       setCurrentStep((prev) => prev - 1);
     }
   }, [currentStep]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && currentStep < totalSteps - 1) {
-        e.preventDefault();
-        handleNext();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentStep, handleNext, totalSteps]);
 
   return (
     <div className="relative mx-auto flex min-h-[580px] max-w-3xl flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-card)] p-6 shadow-2xl md:p-8">
@@ -129,7 +135,7 @@ export default function CalendarBooking() {
               {/* Simplified Outcomes */}
               <div className="rounded-2xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] p-5 space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-text-secondary)]">
-                  What You'll Gain
+                  What You&apos;ll Gain
                 </h3>
                 <ul className="grid gap-2.5 text-xs text-[var(--color-brand-text-secondary)] sm:grid-cols-2">
                   <li className="flex items-center gap-2">
@@ -173,14 +179,27 @@ export default function CalendarBooking() {
                 </p>
               </div>
 
-              {/* Zoho Calendar Container */}
-              <div className="h-[400px] w-full overflow-hidden rounded-2xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)]">
-                <iframe
-                  src="https://calendar.zoho.com/zc/view/slot-booking/zz08011220c73b4b086b81d41d251474a2e4ed7c6dfc322620b4dfa1fd3118cb01417e3221"
-                  title="Appointment Booking"
-                  className="h-full w-full rounded-xl border-0 bg-white"
-                />
-              </div>
+              {calendlyUrl ? (
+                <>
+                  <Script
+                    src="https://assets.calendly.com/assets/external/widget.js"
+                    strategy="afterInteractive"
+                  />
+                  <div className="h-[630px] w-full overflow-hidden rounded-2xl border border-[var(--color-brand-border-muted)] bg-white">
+                    <div
+                      className="calendly-inline-widget h-full min-w-[320px] w-full"
+                      data-url={calendlyUrl}
+                      style={{ minWidth: "320px", height: "100%" }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div role="alert" className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5 text-sm text-amber-100">
+                  Online booking is not configured. Set the frontend
+                  <code className="mx-1 rounded bg-black/20 px-1.5 py-0.5">NEXT_PUBLIC_CALENDLY_URL</code>
+                  to your public Calendly scheduling link.
+                </div>
+              )}
 
               {/* Direct Urgent Email Notice */}
               <div className="flex items-center justify-between rounded-xl border border-[var(--color-brand-border-muted)] bg-[var(--color-brand-bg-deep)] px-4 py-2.5 text-xs">

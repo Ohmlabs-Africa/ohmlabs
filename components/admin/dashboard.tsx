@@ -58,6 +58,8 @@ interface Submission {
   bookingDate?: string;
   bookingTime?: string;
   timezone?: string;
+  bookingStatus?: "scheduled" | "canceled";
+  cancellationReason?: string;
   service?: string;
   details?: Record<string, unknown>;
   notificationSent?: boolean;
@@ -114,6 +116,21 @@ function formatDate(value: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatBookingDate(value: string, timezone?: string) {
+  if (timezone) {
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: timezone,
+      }).format(new Date(value));
+    } catch {
+      return formatDate(value);
+    }
+  }
+  return formatDate(value);
 }
 
 export default function AdminDashboard() {
@@ -842,7 +859,13 @@ function SubmissionRows({
                 {submission.company && <p className="mb-2 text-slate-300"><span className="text-slate-500">Company:</span> {submission.company}</p>}
                 {submission.service && <p className="mb-2 text-slate-300"><span className="text-slate-500">Service:</span> {submission.service}</p>}
                 {submission.fontName && <p className="mb-2 text-slate-300"><span className="text-slate-500">Font:</span> {submission.fontName}</p>}
-                {submission.bookingDate && <p className="mb-2 text-slate-300"><span className="text-slate-500">Booking:</span> {formatDate(submission.bookingDate)} {submission.bookingTime && `(${submission.bookingTime})`} {submission.timezone}</p>}
+                {submission.bookingDate && <p className="mb-2 text-slate-300"><span className="text-slate-500">Booking:</span> {formatBookingDate(submission.bookingDate, submission.timezone)} {submission.bookingTime && `(${submission.bookingTime})`} {submission.timezone}</p>}
+                {submission.type === "calendar_booking" && (
+                  <p className={`mb-2 ${submission.bookingStatus === "canceled" ? "text-red-300" : "text-emerald-300"}`}>
+                    <span className="text-slate-500">Booking status:</span> {submission.bookingStatus === "canceled" ? "Canceled" : "Scheduled"}
+                  </p>
+                )}
+                {submission.cancellationReason && <p className="mb-2 text-slate-300"><span className="text-slate-500">Cancellation reason:</span> {submission.cancellationReason}</p>}
                 {submission.type === "calendar_booking" && !submission.notificationSent && <p className="mb-2 text-amber-300">Booking email notification is pending.</p>}
                 {submission.message && <p className="mt-3 whitespace-pre-wrap text-slate-300">{submission.message}</p>}
               </div>
