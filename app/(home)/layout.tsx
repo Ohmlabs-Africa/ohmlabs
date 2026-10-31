@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import { Partners } from '@/components/layout/partners';
 
 export default function PageLayout({
   children,
@@ -12,6 +13,7 @@ export default function PageLayout({
       <main className="flex-1">
         {children}
       </main>
+      <Partners />
       <Footer />
     </div>
   );
