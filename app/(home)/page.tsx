@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/app/(home)/hero/hero';
-import { Partners } from '@/components/layout/partners';
 import FeaturesPlanet from '@/app/(home)/features/features';
 import ProcessTimeline from '@/app/(home)/features/timeline';
 
